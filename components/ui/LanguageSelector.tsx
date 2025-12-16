@@ -25,7 +25,7 @@ export const LanguageSelector = () => {
             className="fixed inset-0 z-40" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute bottom-full right-0 mb-2 w-32 bg-black/95 border border-white/20 backdrop-blur-xl z-50">
+          <div className="absolute top-full right-0 mt-2 w-32 bg-black/95 border border-white/20 backdrop-blur-xl z-50">
             <div className="p-2">
               <div className="text-[10px] font-mono text-white/40 tracking-widest mb-2">LANGUAGE</div>
               <button
