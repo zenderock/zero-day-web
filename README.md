@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ZERO_DAY
 
-## Getting Started
+> **GitHub Wrapped x Cyberpunk Dystopia x Generative Art**
 
-First, run the development server:
+![ZERO_DAY Screenshot](./page.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌑 Concept
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**ZERO_DAY** transforms your raw development data (commits, PRs, reviews) into an immersive, dark 3D Megastructure. We are breaking away from the cheerful, corporate annual summaries to bring you something visceral.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Your code isn't just stats; it's a structure. A monument.
+The application creates a "Spire" where each floor represents a week of your life. The complexity, materials, and stability of the structure are defined by your coding habits.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Features
 
-## Learn More
+- **The Spire**: Procedural 3D generation based on your GitHub activity.
+- **Visuals**: High-fidelity cyberpunk aesthetic with volumetric mood, neon lighting, and CRT effects.
+- **Synth-Code**: Procedural audio landscape that evolves with your stats.
+- **Story Mode**: An interactive narrative layer analyzing your developer persona.
+- **Internationalization**: Fully localized in English and French.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Core**: [Next.js 14+](https://nextjs.org/) (App Router)
+- **3D Engine**: [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) & [Drei](https://github.com/pmndrs/drei)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animation**: [Framer Motion](https://www.framer.com/motion/)
+- **Auth**: [NextAuth.js](https://next-auth.js.org/)
+- **Data**: GitHub GraphQL API
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+### Prerequisites
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Node.js 18+
+- A GitHub OAuth Application (for authentication)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/zenderock/zero-day.git
+   cd zero-day
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Environment Setup**
+   Create a `.env` file in the root directory:
+
+   ```env
+   GITHUB_ID=your_github_client_id
+   GITHUB_SECRET=your_github_client_secret
+   NEXTAUTH_SECRET=your_generated_secret
+   NEXTAUTH_URL=http://localhost:3000
+   ```
+
+4. **Run Development Server**
+
+   ```bash
+   pnpm  dev
+   ```
+
+5. **Enter the Void**
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🎨 Credits
+
+Designed and built for those who live in the terminal.
+
+---
+
+> _"The code is the structure. The bugs are the glitches. Welcome to Zero Day."_
