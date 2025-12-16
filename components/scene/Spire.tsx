@@ -4,7 +4,7 @@ import { useMemo, useRef } from 'react';
 import { FloorData } from '@/lib/architect';
 import { useFrame } from '@react-three/fiber';
 import { Group } from 'three';
-import { QuadraticBezierLine } from '@react-three/drei';
+import { InteractiveFloor } from './InteractiveFloor';
 
 interface SpireProps {
   data: FloorData[];
@@ -13,8 +13,7 @@ interface SpireProps {
 export const Spire = ({ data }: SpireProps) => {
   const groupRef = useRef<Group>(null);
 
-  // Rotation lente de la tour
-  useFrame((state) => {
+  useFrame(() => {
     if (groupRef.current) {
       groupRef.current.rotation.y += 0.001; 
     }
@@ -26,7 +25,6 @@ export const Spire = ({ data }: SpireProps) => {
       const y = currentY + floor.height / 2;
       currentY += floor.height + 0.05; 
       
-      // Add slight organic imperfection
       const offset = Math.sin(i * 0.5) * 0.2;
       const rotation = Math.cos(i * 0.3) * 0.1;
       
@@ -34,80 +32,86 @@ export const Spire = ({ data }: SpireProps) => {
     });
   }, [data]);
 
+  const totalHeight = useMemo(() => {
+    return floors.reduce((acc, f) => acc + f.height + 0.05, 0);
+  }, [floors]);
+
   return (
     <group ref={groupRef} position={[0, -10, 0]}>
-      {/* Central Core Spine */}
-      <mesh position={[0, 25, 0]}>
-         <cylinderGeometry args={[0.5, 0.5, 60, 8]} />
-         <meshStandardMaterial color="#111" metalness={0.9} roughness={0.1} />
+      <mesh position={[0, totalHeight / 2, 0]}>
+        <cylinderGeometry args={[0.3, 0.5, totalHeight + 10, 8]} />
+        <meshStandardMaterial 
+          color="#080808" 
+          metalness={0.95} 
+          roughness={0.05}
+          emissive="#111"
+          emissiveIntensity={0.1}
+        />
       </mesh>
 
-      {floors.map((floor, i) => (
-        <group key={floor.id} position={[floor.offset, floor.y, floor.offset]} rotation={[0, floor.rotation, 0]}>
-          {/* Main Floor Block */}
-          <mesh>
-            <boxGeometry args={[floor.width, floor.height, floor.width]} />
-            {floor.type === 'VOID' ? (
-                <meshPhysicalMaterial 
-                    color="#000" 
-                    transmission={0.9} // Glass effect
-                    thickness={1}
-                    roughness={0.1}
-                    metalness={0.1}
-                    opacity={0.3}
-                    transparent
-                />
-            ) : (
-                <meshStandardMaterial
-                    color="#0a0a0a"
-                    emissive={floor.color}
-                    emissiveIntensity={floor.type === 'WIREFRAME' ? 0.5 : 2}
-                    roughness={0.3}
-                    metalness={0.8}
-                    wireframe={floor.type === 'WIREFRAME'}
-                />
-            )}
-          </mesh>
-
-          {/* Greebles / Surface Details for Solid Floors */}
-          {floor.type === 'SOLID' && floor.width > 3 && (
-             <group>
-                {/* Random Tech Boxes attached to sides */}
-                <mesh position={[floor.width/2 + 0.2, 0, 0]}>
-                    <boxGeometry args={[0.4, floor.height * 0.8, 0.5]} />
-                    <meshStandardMaterial color="#222" metalness={0.8} />
-                </mesh>
-                <mesh position={[-floor.width/2 - 0.2, 0, 0]}>
-                    <boxGeometry args={[0.4, floor.height * 0.4, 0.5]} />
-                    <meshStandardMaterial color="#222" metalness={0.8} />
-                </mesh>
-             </group>
-          )}
-
-          {/* Hanging Cables (Bezier Curves) */}
-          {floor.type === 'SOLID' && floor.width > 4 && i < floors.length - 1 && (
-             <group>
-               {/* Cable hanging from this floor to a lower point */}
-               <QuadraticBezierLine 
-                  start={[floor.width/2, -floor.height/2, floor.width/2]} 
-                  end={[floor.width/2 + 2, -floor.height*2, floor.width/2 + 1]} 
-                  mid={[floor.width/2 + 1.5, -floor.height, floor.width/2 + 0.5]}
-                  color={floor.color}
-                  lineWidth={2}
-                  transparent
-                  opacity={0.6}
-               />
-               <QuadraticBezierLine 
-                  start={[-floor.width/2, -floor.height/2, -floor.width/2]} 
-                  end={[-floor.width/2 - 1, -floor.height*3, -floor.width/2 - 1]} 
-                  mid={[-floor.width/2 - 1.5, -floor.height, -floor.width/2 - 0.5]}
-                  color="#333"
-                  lineWidth={1}
-               />
-             </group>
-          )}
-        </group>
+      {floors.map((floor) => (
+        <InteractiveFloor
+          key={floor.id}
+          floor={floor}
+          position={[floor.offset, floor.y, floor.offset]}
+          rotation={floor.rotation}
+        />
       ))}
+
+      <DataStreams floors={floors} />
     </group>
   );
 };
+
+function DataStreams({ floors }: { floors: Array<FloorData & { y: number }> }) {
+  const groupRef = useRef<Group>(null);
+  
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.children.forEach((child, i) => {
+        const speed = 0.5 + (i % 3) * 0.2;
+        const offset = (state.clock.elapsedTime * speed + i * 0.5) % 1;
+        const startY = floors[0]?.y || 0;
+        const endY = floors[floors.length - 1]?.y || 20;
+        child.position.y = startY + (endY - startY) * offset;
+        
+        const mat = (child as any).material;
+        if (mat) {
+          mat.opacity = Math.sin(offset * Math.PI) * 0.5;
+        }
+      });
+    }
+  });
+
+  const streams = useMemo(() => {
+    return Array.from({ length: 8 }, (_, i) => ({
+      angle: (i / 8) * Math.PI * 2,
+      radius: 1.5 + Math.random() * 0.5,
+      color: i % 2 === 0 ? '#00f3ff' : '#ff00ff'
+    }));
+  }, []);
+
+  return (
+    <group ref={groupRef}>
+      {streams.map((stream, i) => (
+        <mesh 
+          key={i}
+          position={[
+            Math.cos(stream.angle) * stream.radius,
+            0,
+            Math.sin(stream.angle) * stream.radius
+          ]}
+        >
+          <sphereGeometry args={[0.1, 8, 8]} />
+          <meshStandardMaterial 
+            color={stream.color}
+            emissive={stream.color}
+            emissiveIntensity={2}
+            transparent
+            opacity={0.5}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
