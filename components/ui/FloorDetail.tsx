@@ -1,33 +1,35 @@
 'use client';
 
 import { useDirector } from '@/lib/director';
+import { useLocale } from '@/lib/locale-context';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Activity, Flame, Droplet } from 'lucide-react';
 
 export const FloorDetail = () => {
   const { selectedFloor, hoveredFloor, selectFloor } = useDirector();
+  const { t, locale } = useLocale();
   const floor = selectedFloor || hoveredFloor;
 
   if (!floor) return null;
 
   const isSelected = selectedFloor !== null;
   const weekDate = new Date(floor.date);
-  const weekLabel = weekDate.toLocaleDateString('fr-FR', { 
+  const weekLabel = weekDate.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { 
     day: 'numeric', 
     month: 'short',
     year: 'numeric'
   });
 
   const typeLabels = {
-    SOLID: { label: 'HAUTE_ACTIVITÉ', color: '#00f3ff' },
-    WIREFRAME: { label: 'ACTIVITÉ_MODÉRÉE', color: '#888' },
-    VOID: { label: 'ZONE_SILENCIEUSE', color: '#333' }
+    SOLID: { label: t('floor.types.solid'), color: '#00f3ff' },
+    WIREFRAME: { label: t('floor.types.wireframe'), color: '#888' },
+    VOID: { label: t('floor.types.void'), color: '#333' }
   };
 
   const remarkableLabels = {
-    PEAK: { label: 'SURGE_DÉTECTÉ', icon: Flame, color: '#ff00ff' },
-    DROUGHT: { label: 'VOID_PERIOD', icon: Droplet, color: '#ff3333' },
-    STREAK: { label: 'STREAK_ZONE', icon: Activity, color: '#00ff88' }
+    PEAK: { label: t('floor.remarkable.peak'), icon: Flame, color: '#ff00ff' },
+    DROUGHT: { label: t('floor.remarkable.drought'), icon: Droplet, color: '#ff3333' },
+    STREAK: { label: t('floor.remarkable.streak'), icon: Activity, color: '#00ff88' }
   };
 
   return (
@@ -62,7 +64,7 @@ export const FloorDetail = () => {
             <div className="flex items-start justify-between">
               <div>
                 <div className="text-[10px] font-mono text-white/40 tracking-widest">
-                  SEMAINE #{floor.id + 1}
+                  {t('floor.week')} #{floor.id + 1}
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <Calendar className="w-3 h-3 text-[#00f3ff]" />
@@ -84,18 +86,18 @@ export const FloorDetail = () => {
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white/5 p-3">
                 <div className="text-2xl font-black text-white">{floor.weekTotal}</div>
-                <div className="text-[10px] font-mono text-white/40 tracking-widest">CONTRIBUTIONS</div>
+                <div className="text-[10px] font-mono text-white/40 tracking-widest">{t('floor.contributions')}</div>
               </div>
               <div className="bg-white/5 p-3">
                 <div className="text-2xl font-black text-white">{floor.activeDays}/7</div>
-                <div className="text-[10px] font-mono text-white/40 tracking-widest">JOURS_ACTIFS</div>
+                <div className="text-[10px] font-mono text-white/40 tracking-widest">{t('floor.active_days')}</div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="text-[10px] font-mono text-white/40 tracking-widest">MÉTRIQUES</div>
+              <div className="text-[10px] font-mono text-white/40 tracking-widest">{t('floor.metrics')}</div>
               <div className="flex items-center gap-2">
-                <div className="text-[10px] font-mono text-white/60">HAUTEUR:</div>
+                <div className="text-[10px] font-mono text-white/60">{t('floor.height')}:</div>
                 <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-[#00f3ff] to-[#ff00ff]"
@@ -105,7 +107,7 @@ export const FloorDetail = () => {
                 <div className="text-[10px] font-mono text-white">{floor.height.toFixed(1)}</div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-[10px] font-mono text-white/60">LARGEUR:</div>
+                <div className="text-[10px] font-mono text-white/60">{t('floor.width')}:</div>
                 <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-[#00f3ff]"
@@ -140,7 +142,7 @@ export const FloorDetail = () => {
 
           <div className="px-4 py-2 border-t border-white/10 flex items-center justify-between">
             <span className="text-[10px] font-mono text-white/30">
-              {isSelected ? 'CLIC POUR FERMER' : 'CLIC POUR VERROUILLER'}
+              {isSelected ? t('floor.click_close') : t('floor.click_lock')}
             </span>
             <div 
               className="w-2 h-2 rounded-full animate-pulse"
@@ -152,4 +154,3 @@ export const FloorDetail = () => {
     </AnimatePresence>
   );
 };
-

@@ -4,9 +4,10 @@ import * as Tone from 'tone';
 import { Chapter, useDirector, CHAPTER_SEQUENCE_EXPORT } from '@/lib/director';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, SkipForward, User, GitCommit, Code, Star, Flame, Calendar, TrendingUp, Award, Zap, Share2, Download, ExternalLink, ArrowUp } from 'lucide-react';
-import {  useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { UserStats } from '@/lib/architect';
 import Image from 'next/image';
+import { useLocale } from '@/lib/locale-context';
 
 interface StoryOverlayProps {
   stats: UserStats;
@@ -26,14 +27,15 @@ const CHAPTER_DURATIONS: Partial<Record<Chapter, number>> = {
 
 export const StoryOverlay = ({ stats }: StoryOverlayProps) => {
   const { currentChapter, nextChapter, setChapter, isPaused, togglePause } = useDirector();
+  const { t } = useLocale();
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (currentChapter === 'IDLE' || currentChapter === 'OUTRO' || isPaused) return;
-    
+
     const duration = CHAPTER_DURATIONS[currentChapter] || 6000;
     const startTime = Date.now();
-    
+
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const p = Math.min(elapsed / duration, 1);
@@ -56,8 +58,8 @@ export const StoryOverlay = ({ stats }: StoryOverlayProps) => {
   if (currentChapter === 'IDLE') {
     return (
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <motion.button 
-          onClick={handleStart} 
+        <motion.button
+          onClick={handleStart}
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           whileHover={{ scale: 1.05 }}
@@ -66,8 +68,8 @@ export const StoryOverlay = ({ stats }: StoryOverlayProps) => {
         >
           <Play className="w-8 h-8 fill-current group-hover:scale-110 transition-transform" />
           <div className="text-left">
-            <span className="font-mono tracking-widest text-xl block">ENTER_THE_VOID</span>
-            <span className="text-xs text-white/40 font-mono">DURÉE: ~60 SECONDES</span>
+            <span className="font-mono tracking-widest text-xl block">{t('idle.enter')}</span>
+            <span className="text-xs text-white/40 font-mono">{t('idle.duration')}</span>
           </div>
         </motion.button>
       </div>
@@ -89,8 +91,8 @@ export const StoryOverlay = ({ stats }: StoryOverlayProps) => {
         {currentChapter === 'OUTRO' && <OutroCard key="outro" stats={stats} />}
       </AnimatePresence>
 
-      <ProgressBar 
-        currentChapter={currentChapter} 
+      <ProgressBar
+        currentChapter={currentChapter}
         progress={progress}
         isPaused={isPaused}
         togglePause={togglePause}
@@ -101,9 +103,10 @@ export const StoryOverlay = ({ stats }: StoryOverlayProps) => {
 };
 
 function IntroCard() {
+  const { t } = useLocale();
   return (
     <CardWrapper position="center">
-      <motion.div 
+      <motion.div
         className="text-center space-y-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -117,13 +120,13 @@ function IntroCard() {
         >
           {new Date().getFullYear()}
         </motion.div>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           className="text-[#00f3ff] font-mono tracking-[0.5em] text-sm"
         >
-          ANALYSE_EN_COURS
+          {t('intro.analyzing')}
         </motion.p>
         <motion.div
           initial={{ width: 0 }}
@@ -137,6 +140,7 @@ function IntroCard() {
 }
 
 function ProfileCard({ stats }: { stats: UserStats }) {
+  const { t } = useLocale();
   const { profile } = stats;
   const joinYear = new Date(profile.createdAt).getFullYear();
   const yearsOnGithub = new Date().getFullYear() - joinYear;
@@ -146,11 +150,11 @@ function ProfileCard({ stats }: { stats: UserStats }) {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <User className="w-6 h-6 text-[#00f3ff]" />
-          <span className="text-xs font-mono text-white/40 tracking-widest">PROFIL_DÉTECTÉ</span>
+          <span className="text-xs font-mono text-white/40 tracking-widest">{t('profile.detected')}</span>
         </div>
-        
+
         <div>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="text-5xl font-black text-white"
@@ -161,9 +165,9 @@ function ProfileCard({ stats }: { stats: UserStats }) {
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          <StatBox value={yearsOnGithub} label="ANS_ACTIF" />
-          <StatBox value={profile.followers} label="FOLLOWERS" />
-          <StatBox value={profile.totalRepos} label="REPOS" />
+          <StatBox value={yearsOnGithub} label={t('profile.years_active')} />
+          <StatBox value={profile.followers} label={t('profile.followers')} />
+          <StatBox value={profile.totalRepos} label={t('profile.repos')} />
         </div>
 
         {profile.bio && (
@@ -177,6 +181,7 @@ function ProfileCard({ stats }: { stats: UserStats }) {
 }
 
 function TotalFluxCard({ stats }: { stats: UserStats }) {
+  const { t, locale } = useLocale();
   return (
     <CardWrapper position="center">
       <div className="text-center space-y-6">
@@ -186,24 +191,24 @@ function TotalFluxCard({ stats }: { stats: UserStats }) {
           transition={{ type: "spring", damping: 10 }}
         >
           <div className="text-[3rem] md:text-[5rem] font-black text-transparent bg-clip-text bg-linear-to-b from-white via-white to-white/10 leading-none tracking-tighter">
-            {stats.totalContributions.toLocaleString('fr-FR')}
+            {stats.totalContributions.toLocaleString(locale === 'fr' ? 'fr-FR' : 'en-US')}
           </div>
         </motion.div>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           className="text-[#00f3ff] font-mono tracking-[0.8em] text-lg"
         >
-          CONTRIBUTIONS
+          {t('flux.contributions')}
         </motion.p>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           className="text-white/40 font-mono text-sm max-w-md mx-auto"
         >
-          Chaque commit est une brique. Tu as posé {stats.totalContributions} briques cette année.
+          {t('flux.message', { count: stats.totalContributions })}
         </motion.p>
       </div>
     </CardWrapper>
@@ -211,12 +216,13 @@ function TotalFluxCard({ stats }: { stats: UserStats }) {
 }
 
 function BreakdownCard({ stats }: { stats: UserStats }) {
+  const { t } = useLocale();
   const { breakdown } = stats;
   const items = [
-    { icon: GitCommit, value: breakdown.commits, label: "COMMITS", color: "#00f3ff" },
-    { icon: Code, value: breakdown.pullRequests, label: "PULL_REQUESTS", color: "#ff00ff" },
-    { icon: Zap, value: breakdown.reviews, label: "REVIEWS", color: "#eaff00" },
-    { icon: Star, value: breakdown.issues, label: "ISSUES", color: "#00ff88" },
+    { icon: GitCommit, value: breakdown.commits, label: t('breakdown.commits'), color: "#00f3ff" },
+    { icon: Code, value: breakdown.pullRequests, label: t('breakdown.pull_requests'), color: "#ff00ff" },
+    { icon: Zap, value: breakdown.reviews, label: t('breakdown.reviews'), color: "#eaff00" },
+    { icon: Star, value: breakdown.issues, label: t('breakdown.issues'), color: "#00ff88" },
   ];
 
   return (
@@ -224,7 +230,7 @@ function BreakdownCard({ stats }: { stats: UserStats }) {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <TrendingUp className="w-6 h-6 text-[#ff00ff]" />
-          <span className="text-xs font-mono text-white/40 tracking-widest">DÉCOMPOSITION</span>
+          <span className="text-xs font-mono text-white/40 tracking-widest">{t('breakdown.title')}</span>
         </div>
 
         <div className="space-y-4">
@@ -243,7 +249,7 @@ function BreakdownCard({ stats }: { stats: UserStats }) {
                   <span className="text-[10px] font-mono text-white/40 tracking-wider">{item.label}</span>
                 </div>
                 <div className="h-1 bg-white/10 mt-1 rounded-full overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min((item.value / breakdown.commits) * 100, 100)}%` }}
                     transition={{ delay: 0.3 + i * 0.1, duration: 0.8 }}
@@ -261,7 +267,10 @@ function BreakdownCard({ stats }: { stats: UserStats }) {
 }
 
 function ChronoCard({ stats }: { stats: UserStats }) {
-  const days = ['DIM', 'LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM'];
+  const { t, locale } = useLocale();
+  const days = locale === 'fr'
+    ? ['DIM', 'LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM']
+    : ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const maxDay = Math.max(...stats.weekdayDistribution);
 
   return (
@@ -269,27 +278,27 @@ function ChronoCard({ stats }: { stats: UserStats }) {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Calendar className="w-6 h-6 text-[#eaff00]" />
-          <span className="text-xs font-mono text-white/40 tracking-widest">PATTERN_TEMPOREL</span>
+          <span className="text-xs font-mono text-white/40 tracking-widest">{t('chrono.title')}</span>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
           <div>
             <div className="text-4xl font-black text-white">{stats.maxStreak}</div>
-            <div className="text-[10px] font-mono text-[#00f3ff] tracking-widest">JOURS_STREAK_MAX</div>
+            <div className="text-[10px] font-mono text-[#00f3ff] tracking-widest">{t('chrono.streak_max')}</div>
           </div>
           <div>
             <div className="text-4xl font-black text-white">{stats.weekendRatio}%</div>
-            <div className="text-[10px] font-mono text-[#ff00ff] tracking-widest">WEEKEND_OPS</div>
+            <div className="text-[10px] font-mono text-[#ff00ff] tracking-widest">{t('chrono.weekend_ops')}</div>
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="text-[10px] font-mono text-white/40 tracking-widest">DISTRIBUTION</div>
+          <div className="text-[10px] font-mono text-white/40 tracking-widest">{t('chrono.distribution')}</div>
           <div className="flex gap-2">
             {stats.weekdayDistribution.map((count, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
                 <div className="w-full bg-white/10 rounded-sm overflow-hidden" style={{ height: 60 }}>
-                  <motion.div 
+                  <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${(count / maxDay) * 100}%` }}
                     transition={{ delay: 0.2 + i * 0.05, duration: 0.5 }}
@@ -305,11 +314,11 @@ function ChronoCard({ stats }: { stats: UserStats }) {
 
         <div className="flex justify-between text-sm">
           <div>
-            <span className="text-white/40 font-mono">MEILLEUR_MOIS: </span>
+            <span className="text-white/40 font-mono">{t('chrono.best_month')}: </span>
             <span className="text-[#00f3ff] font-bold uppercase">{stats.bestMonth.name}</span>
           </div>
           <div>
-            <span className="text-white/40 font-mono">JOUR_RECORD: </span>
+            <span className="text-white/40 font-mono">{t('chrono.record_day')}: </span>
             <span className="text-[#ff00ff] font-bold">{stats.busiestDay.count}</span>
           </div>
         </div>
@@ -319,10 +328,11 @@ function ChronoCard({ stats }: { stats: UserStats }) {
 }
 
 function LanguagesCard({ stats }: { stats: UserStats }) {
+  const { t } = useLocale();
   if (stats.languages.length === 0) {
     return (
       <CardWrapper position="center">
-        <div className="text-center text-white/40 font-mono">AUCUN_LANGAGE_DÉTECTÉ</div>
+        <div className="text-center text-white/40 font-mono">{t('languages.none')}</div>
       </CardWrapper>
     );
   }
@@ -332,7 +342,7 @@ function LanguagesCard({ stats }: { stats: UserStats }) {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Code className="w-6 h-6 text-[#00f3ff]" />
-          <span className="text-xs font-mono text-white/40 tracking-widest">STACK_TECHNIQUE</span>
+          <span className="text-xs font-mono text-white/40 tracking-widest">{t('languages.title')}</span>
         </div>
 
         <div className="space-y-3">
@@ -344,7 +354,7 @@ function LanguagesCard({ stats }: { stats: UserStats }) {
               transition={{ delay: i * 0.1 }}
               className="flex items-center gap-3"
             >
-              <div 
+              <div
                 className="w-4 h-4 rounded-sm"
                 style={{ backgroundColor: lang.color }}
               />
@@ -372,6 +382,7 @@ function LanguagesCard({ stats }: { stats: UserStats }) {
 }
 
 function ReposCard({ stats }: { stats: UserStats }) {
+  const { t } = useLocale();
   const topRepos = stats.topRepos.slice(0, 3);
 
   return (
@@ -379,7 +390,7 @@ function ReposCard({ stats }: { stats: UserStats }) {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Star className="w-6 h-6 text-[#eaff00]" />
-          <span className="text-xs font-mono text-white/40 tracking-widest">TOP_REPOSITORIES</span>
+          <span className="text-xs font-mono text-white/40 tracking-widest">{t('repos.title')}</span>
         </div>
 
         <div className="space-y-4">
@@ -396,7 +407,7 @@ function ReposCard({ stats }: { stats: UserStats }) {
                   <h3 className="text-white font-bold">{repo.name}</h3>
                   {repo.language && (
                     <div className="flex items-center gap-2 mt-1">
-                      <div 
+                      <div
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: repo.languageColor || '#888' }}
                       />
@@ -422,12 +433,13 @@ function ReposCard({ stats }: { stats: UserStats }) {
 
 
 function TowerAscentCard() {
+  const { t } = useLocale();
   return (
     <CardWrapper position="right">
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <ArrowUp className="w-6 h-6 text-[#00f3ff]" />
-          <span className="text-xs font-mono text-white/40 tracking-widest">ARCHITECTURE</span>
+          <span className="text-xs font-mono text-white/40 tracking-widest">{t('spire.intro.title')}</span>
         </div>
 
         <div className="relative h-64 pl-4 border-l border-white/10 space-y-12">
@@ -438,8 +450,8 @@ function TowerAscentCard() {
             className="relative"
           >
             <div className="absolute -left-[21px] top-2 w-2 h-2 rounded-full bg-[#00f3ff]" />
-            <p className="text-xl font-bold text-white">Chaque étage = 1 Semaine</p>
-            <p className="text-xs font-mono text-white/40">La structure temporelle de ton année.</p>
+            <p className="text-xl font-bold text-white">{t('spire.intro.floor')}</p>
+            <p className="text-xs font-mono text-white/40">{t('spire.intro.floor_desc')}</p>
           </motion.div>
 
           <motion.div
@@ -449,8 +461,8 @@ function TowerAscentCard() {
             className="relative"
           >
             <div className="absolute -left-[21px] top-2 w-2 h-2 rounded-full bg-[#ff00ff]" />
-            <p className="text-xl font-bold text-white">Hauteur = Volume</p>
-            <p className="text-xs font-mono text-white/40">Plus tu codes, plus la tour s'élève.</p>
+            <p className="text-xl font-bold text-white">{t('spire.intro.height')}</p>
+            <p className="text-xs font-mono text-white/40">{t('spire.intro.height_desc')}</p>
           </motion.div>
 
           <motion.div
@@ -460,8 +472,8 @@ function TowerAscentCard() {
             className="relative"
           >
             <div className="absolute -left-[21px] top-2 w-2 h-2 rounded-full bg-[#eaff00]" />
-            <p className="text-xl font-bold text-white">Vides = Silence</p>
-            <p className="text-xs font-mono text-white/40">Les moments de respiration.</p>
+            <p className="text-xl font-bold text-white">{t('spire.intro.gaps')}</p>
+            <p className="text-xs font-mono text-white/40">{t('spire.intro.gaps_desc')}</p>
           </motion.div>
         </div>
       </div>
@@ -470,6 +482,7 @@ function TowerAscentCard() {
 }
 
 function SpireRevealCard({ stats }: { stats: UserStats }) {
+  const { t } = useLocale();
   return (
     <CardWrapper position="bottom-left">
       <div className="space-y-4">
@@ -477,12 +490,12 @@ function SpireRevealCard({ stats }: { stats: UserStats }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="text-[10px] font-mono text-white/40 tracking-widest mb-2">CLASSIFICATION</div>
+          <div className="text-[10px] font-mono text-white/40 tracking-widest mb-2">{t('spire.classification')}</div>
           <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] via-[#ff00ff] to-[#eaff00]">
             {stats.ranking}
           </div>
         </motion.div>
-        
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -499,11 +512,11 @@ function SpireRevealCard({ stats }: { stats: UserStats }) {
           className="flex gap-4 text-xs font-mono"
         >
           <div>
-            <span className="text-white/40">CONSISTANCE: </span>
+            <span className="text-white/40">{t('spire.consistency')}: </span>
             <span className="text-[#00f3ff]">{stats.consistency}%</span>
           </div>
           <div>
-            <span className="text-white/40">MOY/JOUR: </span>
+            <span className="text-white/40">{t('spire.avg_day')}: </span>
             <span className="text-[#ff00ff]">{stats.averagePerDay}</span>
           </div>
         </motion.div>
@@ -513,17 +526,20 @@ function SpireRevealCard({ stats }: { stats: UserStats }) {
 }
 
 function OutroCard({ stats }: { stats: UserStats }) {
+  const { t, locale } = useLocale();
   const { setChapter } = useDirector();
   const avatarUrl = stats.profile.avatarUrl;
 
   const handleShare = () => {
-    const text = `I built my 2024 Code Architecture on #ZeroDay. \n\nRank: ${stats.ranking}\nTotal Contributions: ${stats.totalContributions}\n\nCheck yours at: https://0_day.vercel.app`;
+    const text = locale === 'fr'
+      ? `J'ai construit mon Architecture de Code 2024 sur #ZeroDay. \n\nRang: ${stats.ranking}\nTotal Contributions: ${stats.totalContributions}\n\nDécouvre la tienne sur: https://00-day.vercel.app`
+      : `I built my 2024 Code Architecture on #ZeroDay. \n\nRank: ${stats.ranking}\nTotal Contributions: ${stats.totalContributions}\n\nCheck yours at: https://00-day.vercel.app`;
     const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="absolute inset-0 flex items-center justify-center bg-black/90 backdrop-blur-lg pointer-events-auto"
@@ -531,7 +547,7 @@ function OutroCard({ stats }: { stats: UserStats }) {
       {/* Background Matrix/Glitch Effect */}
       <div className="absolute inset-0 opacity-10 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(0,243,255,0.2)_50%,transparent_100%)] bg-size-[200%_100%] animate-pulse" />
-        <div className="absolute inset-0" style={{ 
+        <div className="absolute inset-0" style={{
           backgroundImage: 'linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, .3) 25%, rgba(0, 255, 0, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .3) 75%, rgba(0, 255, 0, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, .3) 25%, rgba(0, 255, 0, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .3) 75%, rgba(0, 255, 0, .3) 76%, transparent 77%, transparent)',
           backgroundSize: '50px 50px'
         }} />
@@ -539,38 +555,38 @@ function OutroCard({ stats }: { stats: UserStats }) {
 
       <div className="w-full max-w-2xl p-8 relative z-10">
         <div className="bg-gradient-to-br from-[#0a0a0a] to-black border border-white/10 p-8 space-y-8 relative overflow-hidden group">
-          
+
           {/* Subtle Glitch Border on Hover */}
           <div className="absolute inset-0 border border-[#00f3ff]/0 group-hover:border-[#00f3ff]/50 transition-colors pointer-events-none" />
-          
+
           <div className="flex flex-col md:flex-row gap-6 justify-between items-start border-b border-white/10 pb-6 relative">
-             <div className="flex items-center gap-5 min-w-0 flex-1">
+            <div className="flex items-center gap-5 min-w-0 flex-1">
               {avatarUrl && (
-                  <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-sm overflow-hidden border border-[#00f3ff]/30 shrink-0 shadow-[0_0_15px_rgba(0,243,255,0.1)]">
-                    <Image 
-                      src={avatarUrl} 
-                      alt={stats.profile.login} 
-                      fill 
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-blue-500 mix-blend-overlay opacity-20" />
-                  </div>
+                <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-sm overflow-hidden border border-[#00f3ff]/30 shrink-0 shadow-[0_0_15px_rgba(0,243,255,0.1)]">
+                  <Image
+                    src={avatarUrl}
+                    alt={stats.profile.login}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-blue-500 mix-blend-overlay opacity-20" />
+                </div>
               )}
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight truncate">{stats.profile.name || stats.profile.login}</h2>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
-                    <div className="text-xs font-mono text-[#00f3ff] bg-[#00f3ff]/10 px-1.5 py-0.5 rounded-xs mt-1">
-                      @{stats.profile.login}
-                    </div>
-                    <div className="text-[10px] font-mono text-white/30 hidden sm:block mt-1">
-                      // REPORT: COMPLETE
-                    </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight truncate">{stats.profile.name || stats.profile.login}</h2>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+                  <div className="text-xs font-mono text-[#00f3ff] bg-[#00f3ff]/10 px-1.5 py-0.5 rounded-xs mt-1">
+                    @{stats.profile.login}
+                  </div>
+                  <div className="text-[10px] font-mono text-white/30 hidden sm:block mt-1">
+                    {t('outro.report_complete')}
                   </div>
                 </div>
-             </div>
+              </div>
+            </div>
 
             <div className="flex flex-row md:flex-col items-baseline md:items-end gap-2 md:gap-0 w-full md:w-auto justify-between md:justify-end mt-2 md:mt-0 shrink-0">
-              <div className="text-[10px] font-mono text-white/40 tracking-[0.2em] md:order-last md:mt-1 uppercase">Classification</div>
+              <div className="text-[10px] font-mono text-white/40 tracking-[0.2em] md:order-last md:mt-1 uppercase">{t('outro.classification_label')}</div>
               <div className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] via-[#ff00ff] to-[#ff00ff] drop-shadow-[0_0_10px_rgba(0,243,255,0.3)] whitespace-nowrap">
                 {stats.ranking}
               </div>
@@ -580,41 +596,41 @@ function OutroCard({ stats }: { stats: UserStats }) {
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-white/5 p-4 text-center border border-white/5">
               <div className="text-xl md:text-2xl font-bold text-white">{stats.totalContributions}</div>
-              <div className="text-[8px] font-mono text-white/40 tracking-wider">CONTRIBUTIONS</div>
+              <div className="text-[8px] font-mono text-white/40 tracking-wider">{t('flux.contributions')}</div>
             </div>
             <div className="bg-white/5 p-4 text-center border border-white/5">
               <div className="text-xl md:text-2xl font-bold text-white">{stats.maxStreak}</div>
-              <div className="text-[8px] font-mono text-white/40 tracking-wider">STREAK_MAX</div>
+              <div className="text-[8px] font-mono text-white/40 tracking-wider">{t('chrono.streak_max')}</div>
             </div>
             <div className="bg-white/5 p-4 text-center border border-white/5">
               <div className="text-xl md:text-2xl font-bold text-white">{stats.consistency}%</div>
-              <div className="text-[8px] font-mono text-white/40 tracking-wider">CONSISTANCE</div>
+              <div className="text-[8px] font-mono text-white/40 tracking-wider">{t('spire.consistency')}</div>
             </div>
             <div className="bg-white/5 p-4 text-center border border-white/5">
               <div className="text-xl md:text-2xl font-bold text-white">{stats.totalActiveDays}</div>
-              <div className="text-[8px] font-mono text-white/40 tracking-wider">JOURS_ACTIFS</div>
+              <div className="text-[8px] font-mono text-white/40 tracking-wider">{t('outro.active_days')}</div>
             </div>
           </div>
 
           {stats.calendar && (
             <div>
               <div className="text-[10px] font-mono text-white/40 mb-3 tracking-widest flex justify-between">
-                <span>ACTIVITY_MATRIX</span>
-                <span className="text-[#00f3ff]">SYSTEM_ONLINE</span>
+                <span>{t('outro.activity_matrix')}</span>
+                <span className="text-[#00f3ff]">{t('outro.system_online')}</span>
               </div>
               <div className="flex gap-[2px] flex-wrap justify-center opacity-80 hover:opacity-100 transition-opacity">
                 {stats.calendar.map((week, w) => (
                   <div key={w} className="flex flex-col gap-[2px]">
                     {week.contributionDays.map((day, d) => (
-                      <div 
-                        key={d} 
+                      <div
+                        key={d}
                         className="w-[6px] h-[6px] rounded-[1px]"
-                        style={{ 
-                          backgroundColor: day.contributionCount > 0 
-                            ? day.contributionCount > 10 ? '#ff00ff' 
-                            : day.contributionCount > 5 ? '#00f3ff' 
-                            : '#00f3ff40'
-                            : '#1a1a1a' 
+                        style={{
+                          backgroundColor: day.contributionCount > 0
+                            ? day.contributionCount > 10 ? '#ff00ff'
+                              : day.contributionCount > 5 ? '#00f3ff'
+                                : '#00f3ff40'
+                            : '#1a1a1a'
                         }}
                       />
                     ))}
@@ -625,26 +641,26 @@ function OutroCard({ stats }: { stats: UserStats }) {
           )}
 
           <div className="flex flex-col sm:flex-row justify-between items-center pt-6 border-t border-white/10 gap-4">
-             <button 
+            <button
               onClick={() => setChapter('IDLE')}
               className="text-white/40 hover:text-white font-mono text-xs transition-colors flex items-center gap-2"
             >
               <ExternalLink className="w-3 h-3" />
-              REPLAY_SIMULATION
+              {t('outro.replay_simulation')}
             </button>
-            
+
             <div className="flex gap-3 w-full sm:w-auto">
-                <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/20 text-white font-mono text-xs px-4 py-3 hover:bg-white/10 transition-colors">
-                  <Download className="w-4 h-4" />
-                  SAVE_IMG
-                </button>
-                <button 
-                  onClick={handleShare}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#00f3ff] hover:bg-[#00f3ff]/90 text-black font-bold font-mono text-xs px-6 py-3 transition-colors shadow-[0_0_20px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.5)]"
-                >
-                  <Share2 className="w-4 h-4" />
-                  SHARE_PROTOCOL
-                </button>
+              <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/20 text-white font-mono text-xs px-4 py-3 hover:bg-white/10 transition-colors">
+                <Download className="w-4 h-4" />
+                {t('outro.save_img')}
+              </button>
+              <button
+                onClick={handleShare}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#00f3ff] hover:bg-[#00f3ff]/90 text-black font-bold font-mono text-xs px-6 py-3 transition-colors shadow-[0_0_20px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.5)]"
+              >
+                <Share2 className="w-4 h-4" />
+                {t('outro.share_protocol')}
+              </button>
             </div>
           </div>
         </div>
@@ -683,19 +699,20 @@ function StatBox({ value, label }: { value: number | string; label: string }) {
   );
 }
 
-function ProgressBar({ 
-  currentChapter, 
-  progress, 
+function ProgressBar({
+  currentChapter,
+  progress,
   isPaused,
   togglePause,
-  nextChapter 
-}: { 
-  currentChapter: Chapter; 
+  nextChapter
+}: {
+  currentChapter: Chapter;
   progress: number;
   isPaused: boolean;
   togglePause: () => void;
   nextChapter: () => void;
 }) {
+  const { t } = useLocale();
   const chapters = CHAPTER_SEQUENCE_EXPORT.filter(c => c !== 'IDLE');
   const currentIndex = (chapters as Chapter[]).indexOf(currentChapter);
 
@@ -705,7 +722,7 @@ function ProgressBar({
     <div className="absolute bottom-8 left-8 right-8 pointer-events-auto">
       <div className="flex gap-1 mb-3">
         {chapters.map((chapter, i) => (
-          <div 
+          <div
             key={chapter}
             className="h-1 flex-1 bg-white/10 overflow-hidden"
           >
@@ -713,7 +730,7 @@ function ProgressBar({
               <div className="h-full w-full bg-[#00f3ff]" />
             )}
             {i === currentIndex && (
-              <motion.div 
+              <motion.div
                 className="h-full bg-[#00f3ff]"
                 style={{ width: `${progress}%` }}
               />
@@ -724,7 +741,7 @@ function ProgressBar({
 
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={togglePause}
             className="p-2 hover:bg-white/10 transition-colors"
           >
@@ -735,15 +752,15 @@ function ProgressBar({
             )}
           </button>
           <span className="text-[10px] font-mono text-white/30">
-            {isPaused ? 'EN_PAUSE' : 'LECTURE_AUTO'}
+            {isPaused ? t('controls.paused') : t('controls.playing')}
           </span>
         </div>
 
-        <button 
+        <button
           onClick={nextChapter}
           className="flex items-center gap-2 px-4 py-2 hover:bg-white/5 transition-colors group"
         >
-          <span className="text-xs font-mono text-white/50 group-hover:text-white transition-colors">SUIVANT</span>
+          <span className="text-xs font-mono text-white/50 group-hover:text-white transition-colors">{t('controls.next')}</span>
           <SkipForward className="w-4 h-4 text-[#00f3ff]" />
         </button>
       </div>
