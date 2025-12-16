@@ -15,6 +15,7 @@
     "@types/three": "^0.182.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.26",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.561.0",
     "next": "16.0.10",
     "next-auth": "5.0.0-beta.30",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/html2canvas": "^1.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -4,9 +4,11 @@ import * as Tone from 'tone';
 import { Chapter, useDirector, CHAPTER_SEQUENCE_EXPORT } from '@/lib/director';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, SkipForward, User, GitCommit, Code, Star, Flame, Calendar, TrendingUp, Award, Zap, Share2, Download, ExternalLink, ArrowUp } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { UserStats } from '@/lib/architect';
 import Image from 'next/image';
+import html2canvas from 'html2canvas';
+
 import { useLocale } from '@/lib/locale-context';
 
 interface StoryOverlayProps {
@@ -529,6 +531,31 @@ function OutroCard({ stats }: { stats: UserStats }) {
   const { t, locale } = useLocale();
   const { setChapter } = useDirector();
   const avatarUrl = stats.profile.avatarUrl;
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleSaveImage = async () => {
+    if (!cardRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null, // Transparent background to keep the refined look, or '#000'
+        scale: 2, // Retina quality
+        useCORS: true, // For remote images like avatar
+        allowTaint: true,
+        logging: false
+      });
+      
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `ZERO_DAY_ARCHITECT_${stats.profile.login.toUpperCase()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Failed to generate image:', err);
+    }
+  };
 
   const handleShare = () => {
     const text = locale === 'fr'
@@ -554,7 +581,7 @@ function OutroCard({ stats }: { stats: UserStats }) {
       </div>
 
       <div className="w-full max-w-2xl p-8 relative z-10">
-        <div className="bg-gradient-to-br from-[#0a0a0a] to-black border border-white/10 p-8 space-y-8 relative overflow-hidden group">
+        <div ref={cardRef} className="bg-gradient-to-br from-[#0a0a0a] to-black border border-white/10 p-8 space-y-8 relative overflow-hidden group">
 
           {/* Subtle Glitch Border on Hover */}
           <div className="absolute inset-0 border border-[#00f3ff]/0 group-hover:border-[#00f3ff]/50 transition-colors pointer-events-none" />
@@ -650,7 +677,7 @@ function OutroCard({ stats }: { stats: UserStats }) {
             </button>
 
             <div className="flex gap-3 w-full sm:w-auto">
-              <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/20 text-white font-mono text-xs px-4 py-3 hover:bg-white/10 transition-colors">
+              <button onClick={handleSaveImage} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 border border-white/20 text-white font-mono text-xs px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer">
                 <Download className="w-4 h-4" />
                 {t('outro.save_img')}
               </button>
