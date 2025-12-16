@@ -1,6 +1,6 @@
 'use client';
 
-import { auth, signIn, signOut } from "@/lib/auth";
+import { handleSignIn, handleSignOut } from "@/app/actions";
 import Image from "next/image";
 import { SynthCode } from "@/components/audio/SynthCode";
 import { StoryOverlay } from "@/components/ui/StoryOverlay";
@@ -50,24 +50,14 @@ export function PageClient({ session, stats, floors }: PageClientProps) {
                     className="rounded-none border border-[#00f3ff] w-8 h-8 md:w-10 md:h-10"
                   />
                 )}
-                <form
-                  action={async () => {
-                    "use server";
-                    await signOut();
-                  }}
-                >
+                <form action={handleSignOut}>
                   <button className="px-3 md:px-4 py-1 border border-red-500/50 hover:bg-red-500/10 text-red-500 text-[9px] md:text-[10px] uppercase tracking-widest transition-all font-mono">
                     {t('header.disconnect')}
                   </button>
                 </form>
               </div>
             ) : (
-              <form
-                action={async () => {
-                  "use server";
-                  await signIn("github");
-                }}
-              >
+              <form action={handleSignIn}>
                 <button className="px-5 md:px-6 py-2 border border-white/20 hover:border-[#00f3ff] hover:bg-[#00f3ff]/10 hover:shadow-[0_0_20px_rgba(0,243,255,0.2)] transition-all duration-300 text-[10px] md:text-xs tracking-wider uppercase text-[#00f3ff] font-mono">
                   {t('header.connect')}
                 </button>
@@ -89,12 +79,7 @@ export function PageClient({ session, stats, floors }: PageClientProps) {
             </p>
           </div>
           
-          <form
-            action={async () => {
-              "use server"
-              await signIn("github")
-            }}
-          >
+          <form action={handleSignIn}>
             <button className="px-6 md:px-8 py-3 bg-white/5 border border-white/10 hover:bg-[#00f3ff]/10 hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all font-mono text-sm backdrop-blur-sm group">
               <span className="group-hover:hidden">{t('app.initialize')}</span>
               <span className="hidden group-hover:inline">{t('app.connect')}</span>
