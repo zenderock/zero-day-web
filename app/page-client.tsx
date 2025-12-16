@@ -10,6 +10,7 @@ import { LanguageSelector } from "@/components/ui/LanguageSelector";
 import { useLocale } from "@/lib/locale-context";
 import { UserStats } from "@/lib/architect";
 import { FloorData } from "@/lib/architect";
+import { Github } from 'lucide-react';
 import { Session } from "next-auth";
 
 interface PageClientProps {
@@ -97,6 +98,16 @@ export function PageClient({ session, stats, floors }: PageClientProps) {
               <span>•</span>
               <span>{t('app.features.data')}</span>
             </div>
+            
+            <a 
+              href="https://github.com/zenderock/zero-day-web" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center gap-2 text-white/40 hover:text-[#00f3ff] transition-colors mt-2 group"
+            >
+              <Github className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+              <span className="text-[10px] font-mono tracking-widest opacity-50 group-hover:opacity-100 transition-opacity">SOURCE_CODE</span>
+            </a>
           </div>
         </div>
       )}
