@@ -541,8 +541,7 @@ function OutroCard({ stats }: { stats: UserStats }) {
         cacheBust: true,
         pixelRatio: 2, // Retina quality
         backgroundColor: 'rgba(0,0,0,0)', // Ensure transparency
-        // We can add filter to exclude elements if needed
-        // filter: (node) => node.tagName !== 'BUTTON'
+        fontEmbedCSS: '', // SC-2965: Disable font embedding to fix "trim" error on undefined
       });
       
       const link = document.createElement('a');
