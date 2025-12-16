@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { LocaleProvider } from "@/lib/locale-context";
+import { Analytics } from "@vercel/analytics/next"
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
         <LocaleProvider>
           {children}
         </LocaleProvider>
+        <Analytics />
       </body>
     </html>
   );
