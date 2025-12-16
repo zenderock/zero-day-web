@@ -504,7 +504,7 @@ function SpireRevealCard({ stats }: { stats: UserStats }) {
           transition={{ delay: 0.3 }}
           className="text-white/60 font-mono text-sm max-w-sm border-l-2 border-[#ff00ff]/50 pl-4"
         >
-          {stats.rankingDescription}
+          {t(`rankings.${stats.ranking}`)}
         </motion.p>
 
         <motion.div
@@ -557,8 +557,8 @@ function OutroCard({ stats }: { stats: UserStats }) {
 
   const handleShare = () => {
     const text = locale === 'fr'
-      ? `J'ai construit mon Architecture de Code 2024 sur #ZeroDay. \n\nRang: ${stats.ranking}\nTotal Contributions: ${stats.totalContributions}\n\nDécouvre la tienne sur: https://00-day.vercel.app`
-      : `I built my 2024 Code Architecture on #ZeroDay. \n\nRank: ${stats.ranking}\nTotal Contributions: ${stats.totalContributions}\n\nCheck yours at: https://00-day.vercel.app`;
+      ? `J'ai construit mon Architecture de Code 2025 sur #ZeroDay. \n\nRang: ${stats.ranking}\nTotal Contributions: ${stats.totalContributions}\n\nDécouvre la tienne sur: https://00-day.vercel.app`
+      : `I built my 2025 Code Architecture on #ZeroDay. \n\nRank: ${stats.ranking}\nTotal Contributions: ${stats.totalContributions}\n\nCheck yours at: https://00-day.vercel.app`;
     const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };

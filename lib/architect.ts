@@ -81,7 +81,6 @@ export interface UserStats {
   weekendRatio: number;
   weekdayDistribution: number[];
   ranking: string;
-  rankingDescription: string;
   calendar?: ContributionWeek[];
   topRepos: RepoData[];
   languages: LanguageStat[];
@@ -100,16 +99,16 @@ export interface SpireBlueprint {
   stats: UserStats;
 }
 
-function calculateRanking(total: number, streak: number, consistency: number): { rank: string; description: string } {
-  if (total > 5000 && consistency > 70) return { rank: "NEXUS_ARCHITECT", description: "Tu as transcendé le code. Tu ES le système." };
-  if (total > 5000) return { rank: "CONSTRUCT", description: "Une entité numérique. Tu ne codes plus, tu manifestes." };
-  if (total > 2500 && streak > 30) return { rank: "PRIME_ARCHITECT", description: "Maître bâtisseur. Chaque commit est une brique de ton empire." };
-  if (total > 2500) return { rank: "ARCHITECT", description: "Tu construis des cathédrales de logique." };
-  if (total > 1000 && consistency > 60) return { rank: "CYBERMANCER", description: "Le code coule dans tes veines. Magie digitale." };
-  if (total > 1000) return { rank: "NETRUNNER", description: "Tu navigues la matrice avec aisance." };
-  if (total > 500) return { rank: "SCRIPTER", description: "Tu maîtrises les incantations de base." };
-  if (total > 100) return { rank: "NEOPHYTE", description: "L'éveil commence. Continue." };
-  return { rank: "GHOST", description: "Une présence à peine perceptible dans le réseau." };
+function calculateRanking(total: number, streak: number, consistency: number): { rank: string } {
+  if (total > 5000 && consistency > 70) return { rank: "NEXUS_ARCHITECT" };
+  if (total > 5000) return { rank: "CONSTRUCT" };
+  if (total > 2500 && streak > 30) return { rank: "PRIME_ARCHITECT" };
+  if (total > 2500) return { rank: "ARCHITECT" };
+  if (total > 1000 && consistency > 60) return { rank: "CYBERMANCER" };
+  if (total > 1000) return { rank: "NETRUNNER" };
+  if (total > 500) return { rank: "SCRIPTER" };
+  if (total > 100) return { rank: "NEOPHYTE" };
+  return { rank: "GHOST" };
 }
 
 function findRemarkableEvents(weeks: ContributionWeek[], floors: FloorData[]): RemarkableEvent[] {
@@ -292,7 +291,7 @@ export function transformData(raw: any): SpireBlueprint {
   const averagePerDay = allDays.length > 0 ? Math.round((totalContributions / allDays.length) * 10) / 10 : 0;
   const averagePerWeek = weeks.length > 0 ? Math.round((totalContributions / weeks.length) * 10) / 10 : 0;
 
-  const { rank: ranking, description: rankingDescription } = calculateRanking(totalContributions, maxStreak, consistency);
+  const { rank: ranking } = calculateRanking(totalContributions, maxStreak, consistency);
 
   const floors: FloorData[] = weeks.map((week: ContributionWeek, index: number) => {
     const weekTotal = week.contributionDays.reduce((acc: number, day: ContributionDay) => acc + day.contributionCount, 0);
@@ -335,7 +334,6 @@ export function transformData(raw: any): SpireBlueprint {
       weekendRatio,
       weekdayDistribution: weekdayDist,
       ranking,
-      rankingDescription,
       calendar: weeks,
       topRepos,
       languages,
@@ -364,7 +362,6 @@ function createEmptyBlueprint(): SpireBlueprint {
       weekendRatio: 0,
       weekdayDistribution: [0,0,0,0,0,0,0],
       ranking: 'GHOST',
-      rankingDescription: 'Aucune donnée détectée.',
       topRepos: [],
       languages: [],
       remarkableEvents: [],

@@ -50,7 +50,7 @@ export default async function Home() {
     weekendRatio: 0,
     weekdayDistribution: [0,0,0,0,0,0,0],
     ranking: 'GHOST',
-    rankingDescription: '',
+
     topRepos: [],
     languages: [],
     remarkableEvents: [],
