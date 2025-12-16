@@ -7,7 +7,7 @@ import { Play, Pause, SkipForward, User, GitCommit, Code, Star, Flame, Calendar,
 import { useState, useEffect, useRef } from 'react';
 import { UserStats } from '@/lib/architect';
 import Image from 'next/image';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 import { useLocale } from '@/lib/locale-context';
 
@@ -537,17 +537,16 @@ function OutroCard({ stats }: { stats: UserStats }) {
     if (!cardRef.current) return;
     
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: null, // Transparent background to keep the refined look, or '#000'
-        scale: 2, // Retina quality
-        useCORS: true, // For remote images like avatar
-        allowTaint: true,
-        logging: false
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        pixelRatio: 2, // Retina quality
+        backgroundColor: 'rgba(0,0,0,0)', // Ensure transparency
+        // We can add filter to exclude elements if needed
+        // filter: (node) => node.tagName !== 'BUTTON'
       });
       
-      const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
-      link.href = image;
+      link.href = dataUrl;
       link.download = `ZERO_DAY_ARCHITECT_${stats.profile.login.toUpperCase()}.png`;
       document.body.appendChild(link);
       link.click();
