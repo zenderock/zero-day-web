@@ -5,7 +5,11 @@ import { CameraControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 
-export const Cameraman = () => {
+interface CameramanProps {
+  totalHeight?: number;
+}
+
+export const Cameraman = ({ totalHeight = 50 }: CameramanProps) => {
   const controlsRef = useRef<CameraControls>(null);
   const { currentChapter, selectedFloor, isExploring } = useDirector();
 
@@ -54,15 +58,21 @@ export const Cameraman = () => {
         controls.setLookAt(18, 8, 18, 0, 6, 0, true);
         break;
 
+      case 'TOWER_ASCENT':
+        controls.smoothTime = 12;
+        controls.setLookAt(30, totalHeight, 30, 0, totalHeight * 0.8, 0, true);
+        break;
+
       case 'SPIRE_REVEAL':
-        controls.setLookAt(-25, 35, 25, 0, 15, 0, true);
+        controls.smoothTime = 2;
+        controls.setLookAt(-25, totalHeight + 10, 25, 0, totalHeight, 0, true);
         break;
 
       case 'OUTRO':
         controls.setLookAt(30, 25, 30, 0, 10, 0, true);
         break;
     }
-  }, [currentChapter, selectedFloor, isExploring]);
+  }, [currentChapter, selectedFloor, isExploring, totalHeight]);
 
   useFrame((state) => {
     const controls = controlsRef.current;

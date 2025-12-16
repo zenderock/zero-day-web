@@ -54,7 +54,13 @@ export const translations = {
     spire: {
       classification: "CLASSIFICATION",
       consistency: "CONSISTANCE",
-      avg_day: "MOY/JOUR"
+      avg_day: "MOY/JOUR",
+      intro: {
+        title: "ARCHITECTURE",
+        floor: "CHAQUE_ÉTAGE_=_1_SEMAINE",
+        height: "HAUTEUR_=_VOLUME",
+        gaps: "VIDES_=_SILENCE"
+      }
     },
     outro: {
       title: "RAPPORT_FINAL",
@@ -159,7 +165,13 @@ export const translations = {
     spire: {
       classification: "CLASSIFICATION",
       consistency: "CONSISTENCY",
-      avg_day: "AVG/DAY"
+      avg_day: "AVG/DAY",
+      intro: {
+        title: "ARCHITECTURE",
+        floor: "EACH_FLOOR_=_1_WEEK",
+        height: "HEIGHT_=_VOLUME",
+        gaps: "GAPS_=_SILENCE"
+      }
     },
     outro: {
       title: "FINAL_REPORT",

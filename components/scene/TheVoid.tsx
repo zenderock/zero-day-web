@@ -46,7 +46,7 @@ export const TheVoid = ({ data = [], events = [] }: TheVoidProps) => {
           speed={0.5}
         />
 
-        <Cameraman />
+        <Cameraman totalHeight={totalHeight} />
 
         <gridHelper args={[100, 100, '#0a0a0a', '#050505']} position={[0, -10, 0]} />
 

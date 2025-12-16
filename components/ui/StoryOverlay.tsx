@@ -3,7 +3,7 @@
 import * as Tone from 'tone';
 import { Chapter, useDirector, CHAPTER_SEQUENCE_EXPORT } from '@/lib/director';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, SkipForward, User, GitCommit, Code, Star, Flame, Calendar, TrendingUp, Award, Zap, Share2, Download, ExternalLink } from 'lucide-react';
+import { Play, Pause, SkipForward, User, GitCommit, Code, Star, Flame, Calendar, TrendingUp, Award, Zap, Share2, Download, ExternalLink, ArrowUp } from 'lucide-react';
 import {  useState, useEffect } from 'react';
 import { UserStats } from '@/lib/architect';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ const CHAPTER_DURATIONS: Partial<Record<Chapter, number>> = {
   CHRONO: 8000,
   LANGUAGES: 6000,
   REPOS: 7000,
+  TOWER_ASCENT: 12000,
   SPIRE_REVEAL: 8000,
 };
 
@@ -83,6 +84,7 @@ export const StoryOverlay = ({ stats }: StoryOverlayProps) => {
         {currentChapter === 'CHRONO' && <ChronoCard key="chrono" stats={stats} />}
         {currentChapter === 'LANGUAGES' && <LanguagesCard key="languages" stats={stats} />}
         {currentChapter === 'REPOS' && <ReposCard key="repos" stats={stats} />}
+        {currentChapter === 'TOWER_ASCENT' && <TowerAscentCard key="ascent" />}
         {currentChapter === 'SPIRE_REVEAL' && <SpireRevealCard key="spire" stats={stats} />}
         {currentChapter === 'OUTRO' && <OutroCard key="outro" stats={stats} />}
       </AnimatePresence>
@@ -418,6 +420,55 @@ function ReposCard({ stats }: { stats: UserStats }) {
   );
 }
 
+
+function TowerAscentCard() {
+  return (
+    <CardWrapper position="right">
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <ArrowUp className="w-6 h-6 text-[#00f3ff]" />
+          <span className="text-xs font-mono text-white/40 tracking-widest">ARCHITECTURE</span>
+        </div>
+
+        <div className="relative h-64 pl-4 border-l border-white/10 space-y-12">
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1 }}
+            className="relative"
+          >
+            <div className="absolute -left-[21px] top-2 w-2 h-2 rounded-full bg-[#00f3ff]" />
+            <p className="text-xl font-bold text-white">Chaque étage = 1 Semaine</p>
+            <p className="text-xs font-mono text-white/40">La structure temporelle de ton année.</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 4 }}
+            className="relative"
+          >
+            <div className="absolute -left-[21px] top-2 w-2 h-2 rounded-full bg-[#ff00ff]" />
+            <p className="text-xl font-bold text-white">Hauteur = Volume</p>
+            <p className="text-xs font-mono text-white/40">Plus tu codes, plus la tour s'élève.</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 7 }}
+            className="relative"
+          >
+            <div className="absolute -left-[21px] top-2 w-2 h-2 rounded-full bg-[#eaff00]" />
+            <p className="text-xl font-bold text-white">Vides = Silence</p>
+            <p className="text-xs font-mono text-white/40">Les moments de respiration.</p>
+          </motion.div>
+        </div>
+      </div>
+    </CardWrapper>
+  );
+}
+
 function SpireRevealCard({ stats }: { stats: UserStats }) {
   return (
     <CardWrapper position="bottom-left">
@@ -646,7 +697,7 @@ function ProgressBar({
   nextChapter: () => void;
 }) {
   const chapters = CHAPTER_SEQUENCE_EXPORT.filter(c => c !== 'IDLE');
-  const currentIndex = chapters.indexOf(currentChapter);
+  const currentIndex = (chapters as Chapter[]).indexOf(currentChapter);
 
   if (currentChapter === 'OUTRO') return null;
 

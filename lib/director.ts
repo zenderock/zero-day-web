@@ -10,6 +10,7 @@ export type Chapter =
   | 'CHRONO' 
   | 'LANGUAGES'
   | 'REPOS'
+  | 'TOWER_ASCENT'
   | 'SPIRE_REVEAL' 
   | 'OUTRO';
 
@@ -41,6 +42,7 @@ const CHAPTER_SEQUENCE: Chapter[] = [
   'CHRONO',
   'LANGUAGES',
   'REPOS',
+  'TOWER_ASCENT',
   'SPIRE_REVEAL',
   'OUTRO',
 ];
